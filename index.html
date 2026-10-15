@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çokgenler Atış Poligonu - TYMM 5. Sınıf Matematik</title>
+    <!-- Standalone CSS Reset and Utility styles -->
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ecfdf5 50%, #fffbeb 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid #bae6fd;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-icon {
+            font-size: 30px;
+            background: #e0f2fe;
+            padding: 6px 10px;
+            border-radius: 16px;
+        }
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0369a1;
+        }
+        .brand-subtitle {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-val {
+            font-size: 20px;
+            font-weight: 900;
+            color: #d97706;
+        }
+        .stat-val.blue {
+            color: #0284c7;
+        }
+        .stars {
+            font-size: 22px;
+            letter-spacing: 2px;
+        }
+
+        /* Question Box */
+        .question-card {
+            background: #ffffff;
+            border: 2px solid #bae6fd;
+            border-radius: 24px;
+            padding: 20px 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            margin: 16px auto;
+            position: relative;
+        }
+        .badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            margin-bottom: 10px;
+            border: 1px solid #bae6fd;
+        }
+        .question-text {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.45;
+            min-height: 48px;
+        }
+        .hint-box {
+            display: none;
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            border-radius: 0 12px 12px 0;
+            font-size: 13px;
+            color: #92400e;
+            margin-top: 14px;
+        }
+        .hint-box.active {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        /* Shooting Range Box */
+        .arena-box {
+            background: #020617;
+            border: 4px solid #38bdf8;
+            border-radius: 24px;
+            box-shadow: 0 20px 35px -10px rgba(14, 165, 233, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 16px;
+            z-index: 10;
+        }
+        .target-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 2px solid #475569;
+            border-radius: 16px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 95px;
+        }
+        .target-card:hover {
+            background: rgba(51, 65, 85, 0.85);
+            border-color: #94a3b8;
+            transform: translateY(-2px);
+        }
+        .target-card.selected {
+            background: rgba(14, 165, 233, 0.3);
+            border-color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            transform: scale(1.04);
+        }
+        .target-card.correct-hit {
+            background: rgba(16, 185, 129, 0.5) !important;
+            border-color: #34d399 !important;
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.7);
+        }
+        .target-card.wrong-hit {
+            background: rgba(239, 68, 68, 0.5) !important;
+            border-color: #f87171 !important;
+            box-shadow: 0 0 20px rgba(248, 113, 113, 0.6);
+        }
+        .target-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .target-text {
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Canvas */
+        .canvas-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 650px;
+            height: 140px;
+        }
+
+        /* Controls bar */
+        .hud-bar {
+            background: rgba(2, 6, 23, 0.95);
+            border-top: 1px solid #1e293b;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 10;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        .btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+        .btn-arrow {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+        }
+        .btn-arrow:hover {
+            background: #334155;
+            color: #38bdf8;
+        }
+        .btn-fire {
+            background: linear-gradient(135deg, #f59e0b, #ea580c, #dc2626);
+            color: white;
+            padding: 10px 24px;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4);
+        }
+        .btn-fire:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+        .btn-fire:active {
+            transform: scale(0.96);
+        }
+        .current-aim-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 32px 24px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .modal-desc {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .modal-stats {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 640px) {
+            .targets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hud-bar {
+                justify-content: center;
+            }
+            .brand-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+<script src="/_aistudio-iframe.js?v=6634132a"></script></head>
+<body>
+
+    <!-- Header & Scoreboard -->
+    <header class="container">
+        <div class="brand">
+            <span class="brand-icon">🎯</span>
+            <div>
+                <h1 class="brand-title">Çokgen Avı: Atış Poligonu</h1>
+                <p class="brand-subtitle">TYMM 5. Sınıf Matematik • Çokgenler ve Temel Özellikleri</p>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">PUAN</span>
+                <span id="score-val" class="stat-val">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">SORU</span>
+                <span id="q-counter" class="stat-val blue">1 / 5</span>
+            </div>
+            <div class="stars" id="stars-display">⭐⭐⭐</div>
+        </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <main class="container" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+        
+        <!-- Question Card -->
+        <div class="question-card">
+            <span class="badge" id="category-badge">Kazanım: Çokgen Özellikleri</span>
+            <h2 class="question-text" id="question-text">Soru hazırlanıyor...</h2>
+            
+            <!-- Hint Box -->
+            <div class="hint-box" id="hint-box">
+                <span style="font-size: 20px;">💡</span>
+                <div>
+                    <strong style="display:block; margin-bottom: 2px;">İpucu / Yönlendirme:</strong>
+                    <span id="hint-text">İpucu burada gösterilir.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shooting Range Arena -->
+        <div class="arena-box">
+            <!-- 4 Target Options -->
+            <div class="targets-grid">
+                <div class="target-card" id="card-0" onclick="chooseOption(0)">
+                    <div class="target-badge">A</div>
+                    <div class="target-text" id="opt-0">Seçenek A</div>
+                </div>
+                <div class="target-card" id="card-1" onclick="chooseOption(1)">
+                    <div class="target-badge">B</div>
+                    <div class="target-text" id="opt-1">Seçenek B</div>
+                </div>
+                <div class="target-card" id="card-2" onclick="chooseOption(2)">
+                    <div class="target-badge">C</div>
+                    <div class="target-text" id="opt-2">Seçenek C</div>
+                </div>
+                <div class="target-card" id="card-3" onclick="chooseOption(3)">
+                    <div class="target-badge">D</div>
+                    <div class="target-text" id="opt-3">Seçenek D</div>
+                </div>
+            </div>
+
+            <!-- Cannon & Projectile Canvas -->
+            <div class="canvas-container">
+                <canvas id="rangeCanvas" width="650" height="150"></canvas>
+            </div>
+
+            <!-- Controls & Aim Bar -->
+            <div class="hud-bar">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-arrow" onclick="navAim(-1)" title="Sol Hedef">◄ Sol</button>
+                    <button class="btn btn-arrow" onclick="navAim(1)" title="Sağ Hedef">Sağ ►</button>
+                </div>
+
+                <div>
+                    <button class="btn btn-fire" onclick="fireBullet()">
+                        🔥 ATEŞ ET (BOŞLUK)
+                    </button>
+                </div>
+
+                <div>
+                    <span class="current-aim-badge" id="aim-display">Hedef: A</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        Türkiye Yüzyılı Maarif Modeli Öğretim Materyali © 2026 • Çevrimdışı Çalışabilir Sürüm
+    </footer>
+
+    <!-- Victory Modal -->
+    <div class="modal-overlay" id="end-modal">
+        <div class="modal-content">
+            <div class="modal-icon">🏆</div>
+            <h3 class="modal-title">Tebrikler!</h3>
+            <p class="modal-desc">Çokgen görevlerinin tamamını başarıyla tamamladın ve 5. sınıf kazanımlarını pekiştirdin.</p>
+            
+            <div class="modal-stats">
+                <div>
+                    <div class="stat-label">TOPLAM PUAN</div>
+                    <div class="stat-val" id="final-score" style="font-size: 24px;">100</div>
+                </div>
+                <div>
+                    <div class="stat-label">DEĞERLENDİRME</div>
+                    <div style="font-size: 20px;" id="final-stars">⭐⭐⭐</div>
+                </div>
+            </div>
+
+            <button class="btn btn-fire" style="width: 100%; justify-content: center; padding: 12px;" onclick="restartGame()">
+                Yeniden Oyna 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Self-Contained Script (Offline Sound Synthesizer + Game Engine) -->
+    <script>
+        // Web Audio Synthesizer (Zero internet required)
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) audioCtx = new AudioClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playTone(freq, type, duration, endFreq = null, gainVal = 0.15) {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const now = ctx.currentTime;
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                if (endFreq) {
+                    osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+                }
+                gain.gain.setValueAtTime(gainVal, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + duration + 0.02);
+            } catch (e) {}
+        }
+
+        function playShootSound() {
+            playTone(850, 'sawtooth', 0.18, 120, 0.15);
+        }
+        function playCorrectSound() {
+            [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+                setTimeout(() => playTone(f, 'triangle', 0.22, null, 0.15), i * 70);
+            });
+        }
+        function playWrongSound() {
+            playTone(150, 'sawtooth', 0.25, 90, 0.2);
+        }
+        function playAimSound() {
+            playTone(550, 'sine', 0.04, 750, 0.05);
+        }
+
+        // Questions Data
+        const questions = [
+            {
+                category: "Kazanım: Çokgen Tanımı",
+                question: "Aşağıdakilerden hangisi bir çokgendir ve temel özelliklerini eksiksiz taşır?",
+                options: [
+                    "Çember (Eğri çizgilerden oluşur)",
+                    "Üçgen (Doğru parçalarıyla kapalı şekil)",
+                    "Açık kırık çizgi",
+                    "Kenarları yay şeklinde olan şekil"
+                ],
+                correct: 1,
+                hint: "Çokgenler en az 3 doğru parçasının uç uca eklenmesiyle oluşan kapalı şekillerdir. Eğri veya açık şekiller çokgen olamaz."
+            },
+            {
+                category: "Kazanım: Temel Elemanlar",
+                question: "Bir beşgenin kenar sayısı ile köşe sayısı arasındaki ilişki aşağıdakilerden hangisidir?",
+                options: [
+                    "Kenar sayısı köşeden 1 fazladır.",
+                    "Köşe sayısı kenar sayısından 2 fazladır.",
+                    "Kenar sayısı, köşe sayısına eşittir.",
+                    "Köşe sayısı kenar sayısının 2 katıdır."
+                ],
+                correct: 2,
+                hint: "Çokgenlerde kenar, köşe ve iç açı sayıları birbirine daima eşittir. Beşgenin 5 kenarı varsa kaç köşesi vardır?"
+            },
+            {
+                category: "Kazanım: Köşegen Kavramı",
+                question: "Aşağıdaki çokgenlerden hangisinin köşegeni yoktur?",
+                options: [
+                    "Üçgen",
+                    "Dörtgen",
+                    "Beşgen",
+                    "Altıgen"
+                ],
+                correct: 0,
+                hint: "Köşegen, komşu olmayan iki köşeyi birleştiren doğru parçasıdır. Üçgenin tüm köşeleri birbiriyle komşudur."
+            },
+            {
+                category: "Kazanım: Köşegenler & Üçgenler",
+                question: "Bir altıgenin bir köşesinden çizilen köşegenler, bu altıgeni kaç adet üçgene ayırır?",
+                options: [
+                    "2 üçgen",
+                    "3 üçgen",
+                    "4 üçgen",
+                    "5 üçgen"
+                ],
+                correct: 2,
+                hint: "n kenarlı bir çokgende bir köşeden çıkan köşegenlerle (n - 2) tane üçgen oluşur. 6 kenar için: 6 - 2 = 4!"
+            },
+            {
+                category: "Kazanım: Çokgen İsimleri",
+                question: "Kenar sayıları sırasıyla 4, 5 ve 6 olan çokgenlerin adları sırasıyla hangi seçenekte doğru verilmiştir?",
+                options: [
+                    "Üçgen - Dörtgen - Beşgen",
+                    "Dörtgen - Beşgen - Altıgen",
+                    "Beşgen - Altıgen - Sekizgen",
+                    "Dörtgen - Altıgen - Sekizgen"
+                ],
+                correct: 1,
+                hint: "4 kenarlı dörttür, 5 kenarlı beştir, 6 kenarlı altıdır. İsimleri kenar sayılarına göre belirlenir."
+            }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+        let selectedAim = 0;
+        let isShooting = false;
+        let stars = 3;
+
+        // Elements
+        const canvas = document.getElementById('rangeCanvas');
+        const ctx = canvas.getContext('2d');
+        const questionTextEl = document.getElementById('question-text');
+        const categoryBadgeEl = document.getElementById('category-badge');
+        const qCounterEl = document.getElementById('q-counter');
+        const scoreValEl = document.getElementById('score-val');
+        const starsDisplayEl = document.getElementById('stars-display');
+        const hintBoxEl = document.getElementById('hint-box');
+        const hintTextEl = document.getElementById('hint-text');
+        const aimDisplayEl = document.getElementById('aim-display');
+        const modalEl = document.getElementById('end-modal');
+        const cards = [
+            document.getElementById('card-0'),
+            document.getElementById('card-1'),
+            document.getElementById('card-2'),
+            document.getElementById('card-3')
+        ];
+        const optTexts = [
+            document.getElementById('opt-0'),
+            document.getElementById('opt-1'),
+            document.getElementById('opt-2'),
+            document.getElementById('opt-3')
+        ];
+
+        function initGame() {
+            currentQIndex = 0;
+            score = 0;
+            stars = 3;
+            selectedAim = 0;
+            scoreValEl.textContent = score;
+            starsDisplayEl.textContent = '⭐⭐⭐';
+            modalEl.classList.remove('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                showEndModal();
+                return;
+            }
+
+            const q = questions[currentQIndex];
+            categoryBadgeEl.textContent = q.category;
+            questionTextEl.textContent = q.question;
+            qCounterEl.textContent = `${currentQIndex + 1} / ${questions.length}`;
+            hintBoxEl.classList.remove('active');
+            isShooting = false;
+
+            q.options.forEach((opt, idx) => {
+                optTexts[idx].textContent = opt;
+                cards[idx].className = 'target-card';
+            });
+
+            selectedAim = 0;
+            updateSelectionUI();
+            drawCannon();
+        }
+
+        function updateSelectionUI() {
+            cards.forEach((card, idx) => {
+                if (idx === selectedAim) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            const letters = ['A', 'B', 'C', 'D'];
+            aimDisplayEl.textContent = `Hedef: ${letters[selectedAim]}`;
+        }
+
+        function navAim(delta) {
+            if (isShooting) return;
+            selectedAim = (selectedAim + delta + 4) % 4;
+            playAimSound();
+            updateSelectionUI();
+            drawCannon();
+        }
+
+        function chooseOption(idx) {
+            if (isShooting) return;
+            if (selectedAim === idx) {
+                fireBullet();
+            } else {
+                selectedAim = idx;
+                playAimSound();
+                updateSelectionUI();
+                drawCannon();
+            }
+        }
+
+        function drawCannon(bulletX = null, bulletY = null) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const targetWidth = canvas.width / 4;
+            const targetX = targetWidth * (selectedAim + 0.5);
+            const targetY = 15;
+            const cannonX = canvas.width / 2;
+            const cannonY = canvas.height - 12;
+
+            // Laser guide line
+            ctx.save();
+            ctx.beginPath();
+            ctx.setLineDash([4, 6]);
+            ctx.moveTo(cannonX, cannonY);
+            ctx.lineTo(targetX, targetY);
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+
+            // Turret Base
+            ctx.beginPath();
+            ctx.arc(cannonX, cannonY, 24, Math.PI, 0, false);
+            ctx.fillStyle = '#0284c7';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#38bdf8';
+            ctx.stroke();
+
+            // Rotating Barrel
+            const angle = Math.atan2(targetY - cannonY, targetX - cannonX);
+            ctx.save();
+            ctx.translate(cannonX, cannonY);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(0, -7, 44, 14);
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(40, -9, 5, 18);
+            ctx.restore();
+
+            // Projectile in motion
+            if (bulletX !== null && bulletY !== null) {
+                ctx.beginPath();
+                ctx.arc(bulletX, bulletY, 7, 0, Math.PI * 2);
+                ctx.fillStyle = '#ef4444';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(bulletX, bulletY, 11, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+                ctx.fill();
+            }
+        }
+
+        function fireBullet() {
+            if (isShooting) return;
+            isShooting = true;
+            hintBoxEl.classList.remove('active');
+            playShootSound();
+
+            const targetWidth = canvas.width / 4;
+            const targetX = targetWidth * (selectedAim + 0.5);
+            const targetY = 15;
+            const cannonX = canvas.width / 2;
+            const cannonY = canvas.height - 12;
+
+            let progress = 0;
+            const speed = 0.08;
+
+            function step() {
+                progress += speed;
+                if (progress >= 1) progress = 1;
+
+                const curX = cannonX + (targetX - cannonX) * progress;
+                const curY = cannonY + (targetY - cannonY) * progress;
+
+                drawCannon(curX, curY);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    checkAnswer();
+                }
+            }
+            step();
+        }
+
+        function checkAnswer() {
+            const q = questions[currentQIndex];
+            const targetCard = cards[selectedAim];
+
+            if (selectedAim === q.correct) {
+                // Correct
+                playCorrectSound();
+                score += 20;
+                scoreValEl.textContent = score;
+
+                targetCard.classList.remove('selected');
+                targetCard.classList.add('correct-hit');
+
+                setTimeout(() => {
+                    currentQIndex++;
+                    loadQuestion();
+                }, 1100);
+            } else {
+                // Wrong
+                playWrongSound();
+                targetCard.classList.remove('selected');
+                targetCard.classList.add('wrong-hit');
+
+                hintTextEl.textContent = q.hint;
+                hintBoxEl.classList.add('active');
+
+                setTimeout(() => {
+                    targetCard.classList.remove('wrong-hit');
+                    updateSelectionUI();
+                    isShooting = false;
+                    drawCannon();
+                }, 900);
+            }
+        }
+
+        function showEndModal() {
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-stars').textContent = starsDisplayEl.textContent;
+            modalEl.classList.add('active');
+        }
+
+        function restartGame() {
+            initGame();
+        }
+
+        // Keyboard support
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                navAim(-1);
+            } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                navAim(1);
+            } else if (e.code === 'Space' || e.key === 'Enter') {
+                e.preventDefault();
+                fireBullet();
+            } else if (['1', '2', '3', '4'].includes(e.key)) {
+                chooseOption(parseInt(e.key) - 1);
+            }
+        });
+
+        // Initialize when window loads
+        window.onload = () => {
+            initGame();
+        };
+    </script>
+</body>
+</html>
